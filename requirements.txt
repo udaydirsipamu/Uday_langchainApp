@@ -5,7 +5,7 @@ pytesseract
 ultralytics
 YOLO
 inflect
-cv2
+opencv-python
 pyttsx3
 numpy
 transformers
