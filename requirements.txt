@@ -1,12 +1,14 @@
-import streamlit as st
-from PIL import Image
-import pytesseract
-from ultralytics import YOLO
-import inflect
-import cv2
-import pyttsx3
-import numpy as np
-from transformers import BlipProcessor, BlipForConditionalGeneration
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
+streamlit
+PIL
+Image
+pytesseract
+ultralytics
+YOLO
+inflect
+cv2
+pyttsx3
+numpy
+transformers
+BlipProcessor
+BlipForConditionalGeneration
+langchain_google_genai
