@@ -2,12 +2,9 @@ streamlit
 Pillow
 pytesseract
 ultralytics
-YOLO
 inflect
 opencv-python
 pyttsx3
 numpy
 transformers
-BlipProcessor
-BlipForConditionalGeneration
 langchain-google-genai
