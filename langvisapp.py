@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 from PIL import Image
 import pytesseract
@@ -12,7 +13,11 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
 # Configure Tesseract executable path
-pytesseract.pytesseract.tesseract_cmd = r"F:\Program Files\Tesseract-OCR\tesseract.exe"
+if os.name == 'nt':  # For Windows
+    pytesseract.pytesseract.tesseract_cmd = r"F:\Program Files\Tesseract-OCR\tesseract.exe"
+else:  # For Linux/Cloud environments
+    pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
+
 st.set_page_config(page_title="AI Assistant App", layout="wide")
 
 # Load BLIP Model for image captioning
