@@ -3,8 +3,9 @@ Pillow
 pytesseract
 ultralytics
 inflect
-opencv-python-headless
+opencv-python
 pyttsx3
 numpy
 transformers
 langchain-google-genai
+espeak-ng  # Add espeak-ng if necessary
