@@ -1,6 +1,5 @@
 streamlit
 Pillow
-Image
 pytesseract
 ultralytics
 YOLO
@@ -11,4 +10,4 @@ numpy
 transformers
 BlipProcessor
 BlipForConditionalGeneration
-langchain_google_genai
+langchain-google-genai
