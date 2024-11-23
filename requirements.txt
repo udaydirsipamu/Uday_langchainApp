@@ -1,11 +1,10 @@
 streamlit
 Pillow
 pytesseract
-ultralytics
+ultralytics==8.0.32  # Ensure compatibility with Python 3.12
 inflect
 opencv-python
 pyttsx3
 numpy
 transformers
 langchain-google-genai
-espeak-ng  # Add espeak-ng if necessary
