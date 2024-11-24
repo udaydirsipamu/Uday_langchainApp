@@ -13,11 +13,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
 # Configure Tesseract executable path
-if os.name == 'nt':  # For Windows
-    pytesseract.pytesseract.tesseract_cmd = r"F:\Program Files\Tesseract-OCR\tesseract.exe"
-else:  # For Linux/Cloud environments
-    pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
-
+pytesseract.pytesseract.tesseract_cmd = r"F:\Program Files\Tesseract-OCR\tesseract.exe"
 st.set_page_config(page_title="AI Assistant App", layout="wide")
 
 # Load BLIP Model for image captioning
@@ -46,7 +42,7 @@ output_parser = StrOutputParser()
 
 # Sidebar description
 with st.sidebar:
-    st.markdown("<h1 style='text-align: center; margin-top: 5px;'>👁️</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; margin-top: 5px;'>👁️👁️</h1>", unsafe_allow_html=True)
     st.markdown("""
     ### Features of the App:
     - **👁️ Scene Description**: Automatically generate meaningful context from uploaded images.
