@@ -35,9 +35,10 @@ yolo_model = load_yolo_model()
 
 # Google Generative AI Configuration
 chat_model = ChatGoogleGenerativeAI(
-    google_api_key="AIzaSyBpBRtvT1h6X9LIWWsrrQE9d9HAvBWUZEk",
+    google_api_key="GOOGLE_API_KEY",
     model="gemini-1.5-flash"
 )
+#Enter your api key
 output_parser = StrOutputParser()
 
 # Sidebar description
