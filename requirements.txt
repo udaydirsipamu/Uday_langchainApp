@@ -1,5 +1,5 @@
 streamlit
-Pillow
+Pillow/PIL
 pytesseract
 ultralytics==8.0.32  # Ensure compatibility with Python 3.12
 inflect
