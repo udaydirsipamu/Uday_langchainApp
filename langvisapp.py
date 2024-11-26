@@ -1,4 +1,3 @@
-import os
 import streamlit as st
 from PIL import Image
 import pytesseract
@@ -33,17 +32,16 @@ def load_yolo_model():
 
 yolo_model = load_yolo_model()
 
-# Google Generative AI Configuration
+# Google Generative AI Configuration and enter your google api key
 chat_model = ChatGoogleGenerativeAI(
     google_api_key="GOOGLE_API_KEY",
     model="gemini-1.5-flash"
 )
-#Enter your api key
 output_parser = StrOutputParser()
 
 # Sidebar description
 with st.sidebar:
-    st.image("https://d12aarmt01l54a.cloudfront.net/cms/images/Media-20191126170702/808-440.png",use_container_width=True)
+    st.image("https://d12aarmt01l54a.cloudfront.net/cms/images/Media-20191126170702/808-440.png", use_container_width=True)
     st.markdown("""
     ### Features of the App:
     - **👁️ Scene Description**: Automatically generate meaningful context from uploaded images.
@@ -72,6 +70,17 @@ if image_file:
 # Inflect for pluralization
 p = inflect.engine()
 
+# Function for generating `natural_language_output`
+def generate_natural_language_output(yolo_results):
+    object_counts = {}
+    for box in yolo_results[0].boxes.data.cpu().numpy():
+        cls = int(box[5])  # Class index
+        object_name = yolo_results[0].names[cls]
+        object_counts[object_name] = object_counts.get(object_name, 0) + 1
+
+    object_descriptions = [f"{count} {p.plural(obj, count)}" for obj, count in object_counts.items()]
+    return ", ".join(object_descriptions)
+
 # Buttons in a row
 st.markdown("<h3>Select a Feature:</h3>", unsafe_allow_html=True)
 button_style = """
@@ -95,9 +104,9 @@ with col1:
 with col2:
     tts_btn = st.button("🗣️ Text to Speech")
 with col3:
-    detect_btn = st.button("🚧 Detect Objects")
+    detect_btn = st.button("🚧 Object detection")
 with col4:
-    assist_btn = st.button("🤖 Assistance")
+    assist_btn = st.button("🤖 Personalized Assistance")
 
 # Display the relevant feature's content
 if scene_btn:
@@ -151,67 +160,62 @@ if tts_btn:
 if detect_btn:
     st.subheader("Object Detection")
     if image_file:
-            # Detect objects using YOLO
-            results = yolo_model(opencv_image)
-            labeled_image = results[0].plot()
-            st.image(labeled_image, caption="Object Detection Output", use_container_width=True)
+        results = yolo_model(opencv_image)
+        labeled_image = results[0].plot()
+        st.image(labeled_image, caption="Object Detection Output", use_container_width=True)
 
-            # Extract and count detected objects
-            object_counts = {}
-            for box in results[0].boxes.data.cpu().numpy():
-                cls = int(box[5])  # Class index
-                object_name = results[0].names[cls]
-                object_counts[object_name] = object_counts.get(object_name, 0) + 1
+        natural_language_output = generate_natural_language_output(results)
 
-            # Create natural language summary
-            object_descriptions = [f"{count} {p.plural(obj, count)}" for obj, count in object_counts.items()]
-            natural_language_output = ", ".join(object_descriptions)
+        object_prompt_template = ChatPromptTemplate.from_messages([
+            ("system", "You are an AI assistant analyzing detected objects for visually impaired users."),
+            ("human", f"Detected objects: {natural_language_output}. Provide a brief and clear explanation of these objects "
+                      "and offer navigational tips for safety.")
+        ])
+        object_chain = object_prompt_template | chat_model | output_parser
+        object_description = object_chain.invoke({})
 
-            # LangChain for object significance
-            object_prompt_template = ChatPromptTemplate.from_messages([
-                ("system", "You are an AI assistant analyzing detected objects for visually impaired users."),
-                ("human", f"Detected objects: {natural_language_output}. Provide a brief and clear explanation of these objects "
-                        "and offer navigational tips for safety."
-                        "Do not highlight the prompt mentioned here instead give reasonale ouput.")
-            ])
-            object_chain = object_prompt_template | chat_model | output_parser
-            object_description = object_chain.invoke({})
+        st.subheader("List of Objects and Navigatopn Tips:")
+        st.write("Detected objects:")
+        st.text(natural_language_output)
+        st.write("Description:")
+        st.write(object_description)
 
-            st.subheader("List of Objects or Obstacles")
-            st.write("Detected objects:")
-            st.text(natural_language_output)
-            st.write("Description:")
-            st.write(object_description)
-
-            # Convert object description to speech
-            speech = pyttsx3.init()
-            output_file = "objects_audio.mp3"
-            speech.save_to_file(object_description, output_file)
-            speech.runAndWait()
-            st.audio(output_file, format="audio/mp3")
+        speech = pyttsx3.init()
+        output_file = "objects_audio.mp3"
+        speech.save_to_file(object_description, output_file)
+        speech.runAndWait()
+        st.audio(output_file, format="audio/mp3")
+        st.success("Ojects detected successfully  and converted to speech!")
 
 if assist_btn:
     st.subheader("Personalized Assistance")
     if image_file:
-            # Extract text using OCR or BLIP for fallback
-            extracted_text = pytesseract.image_to_string(image).strip()
-            if not extracted_text:
-                inputs = processor(image, return_tensors="pt")
-                outputs = model.generate(**inputs)
-                extracted_text = processor.decode(outputs[0], skip_special_tokens=True)
+        extracted_text = pytesseract.image_to_string(image).strip()
+        if not extracted_text:
+            inputs = processor(image, return_tensors="pt")
+            outputs = model.generate(**inputs)
+            extracted_text = processor.decode(outputs[0], skip_special_tokens=True)
 
-            # LangChain for personalized assistance
-            assistance_prompt_template = ChatPromptTemplate.from_messages([
-                ("system", "You are an AI assistant offering tailored guidance for visually impaired users."),
-                ("human", f"The uploaded image contains the following context: {extracted_text}. "
-                        "Provide actionable suggestions in a clear and concise format to assist the user effectively and also do not highlight visually imapired such type of words  here as user needs only accurate output.")
-            ])
-            assistance_chain = assistance_prompt_template | chat_model | output_parser
-            assistance_response = assistance_chain.invoke({})
+        results = yolo_model(opencv_image)
+        natural_language_output = generate_natural_language_output(results)
 
-            st.write(assistance_response)
-            speech = pyttsx3.init()
-            output_file = "personalized_assistance_audio.mp3"
-            speech.save_to_file(assistance_response, output_file)
-            speech.runAndWait()
-            st.audio(output_file, format="audio/mp3")
+        assistance_prompt_template = ChatPromptTemplate.from_messages([
+            ("system", "You are an AI assistant offering tailored guidance based on image context."),
+            ("human", f"""
+                The image context is as follows: {extracted_text or "Not available"}. The detected objects are: {natural_language_output}.
+                Provide clear, specific, and concise suggestions to assist the user in navigating or understanding the image. 
+                - Mention actionable items (e.g., 'cross the road at the zebra crossing').
+                - Avoid generic phrases and focus on practical advice for safety and efficiency in a bulletien points.
+                - Use an encouraging and supportive tone without redundant information.
+            """)
+        ])
+        assistance_chain = assistance_prompt_template | chat_model | output_parser
+        assistance_response = assistance_chain.invoke({})
+        st.write(assistance_response)
+
+        speech = pyttsx3.init()
+        output_file = "personalized_assistance_audio.mp3"
+        speech.save_to_file(assistance_response, output_file)
+        speech.runAndWait()
+        st.audio(output_file, format="audio/mp3")
+        st.success("Personalized assistance done successfully!")
