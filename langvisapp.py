@@ -43,7 +43,7 @@ output_parser = StrOutputParser()
 
 # Sidebar description
 with st.sidebar:
-    st.markdown("<h1 style='text-align: center; margin-top: 5px;'>👁️👁️</h1>", unsafe_allow_html=True)
+    st.image("https://d12aarmt01l54a.cloudfront.net/cms/images/Media-20191126170702/808-440.png",use_container_width=True)
     st.markdown("""
     ### Features of the App:
     - **👁️ Scene Description**: Automatically generate meaningful context from uploaded images.
