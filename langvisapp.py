@@ -70,7 +70,7 @@ if image_file:
 # Inflect for pluralization
 p = inflect.engine()
 
-# Function for generating `natural_language_output`
+# Function for generating natural_language_output
 def generate_natural_language_output(yolo_results):
     object_counts = {}
     for box in yolo_results[0].boxes.data.cpu().numpy():
